@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import splprep, splev
 from glob import glob
 
-input_json = '../output/raw_GPS.json'
+input_json = '../output/raw_coords.json'
 images_folder = '../images'
 output_json = '../output/raw_dataset.json'
-min_dist = 2.0
+min_dist = 1.0
 
 def read_raw_gps(input_json):
     with open(input_json, 'r') as f:
