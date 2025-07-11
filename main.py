@@ -44,19 +44,19 @@ parser.add_argument('--momentum', type=float, default=0.9, help='Momentum for SG
 parser.add_argument('--nocuda', action='store_true', help='Dont use cuda')
 parser.add_argument('--threads', type=int, default=8, help='Number of threads for each data loader to use')
 parser.add_argument('--seed', type=int, default=123, help='Random seed to use.')
-parser.add_argument('--dataPath', type=str, default='/nfs/ibrahimi/data/', help='Path for centroid data.')
-parser.add_argument('--runsPath', type=str, default='/nfs/ibrahimi/runs/', help='Path to save runs to.')
+parser.add_argument('--dataPath', type=str, default='data/images/', help='Path for centroid data.')
+parser.add_argument('--runsPath', type=str, default='runs/', help='Path to save runs to.')
 parser.add_argument('--savePath', type=str, default='checkpoints', 
         help='Path to save checkpoints to in logdir. Default=checkpoints/')
-parser.add_argument('--cachePath', type=str, default=environ['TMPDIR'], help='Path to save cache to.')
+parser.add_argument('--cachePath', type=str, default='cache/', help='Path to save cache to.')
 parser.add_argument('--resume', type=str, default='', help='Path to load checkpoint from, for resuming training or testing.')
 parser.add_argument('--ckpt', type=str, default='latest', 
         help='Resume from latest or best checkpoint.', choices=['latest', 'best'])
 parser.add_argument('--evalEvery', type=int, default=1, 
         help='Do a validation set run, and save, every N epochs.')
 parser.add_argument('--patience', type=int, default=10, help='Patience for early stopping. 0 is off.')
-parser.add_argument('--dataset', type=str, default='pittsburgh', 
-        help='Dataset to use', choices=['pittsburgh'])
+parser.add_argument('--dataset', type=str, default='custom',
+        help='Dataset to use')
 parser.add_argument('--arch', type=str, default='vgg16', 
         help='basenetwork to use', choices=['vgg16', 'alexnet'])
 parser.add_argument('--vladv2', action='store_true', help='Use VLAD v2')
@@ -64,8 +64,8 @@ parser.add_argument('--pooling', type=str, default='netvlad', help='type of pool
         choices=['netvlad', 'max', 'avg'])
 parser.add_argument('--num_clusters', type=int, default=64, help='Number of NetVlad clusters. Default=64')
 parser.add_argument('--margin', type=float, default=0.1, help='Margin for triplet loss. Default=0.1')
-parser.add_argument('--split', type=str, default='val', help='Data split to use for testing. Default is val', 
-        choices=['test', 'test250k', 'train', 'val'])
+parser.add_argument('--split', type=str, default='val', help='Data split to use for testing. Default is val',
+        choices=['test', 'train', 'val'])
 parser.add_argument('--fromscratch', action='store_true', help='Train from scratch rather than using pretrained models')
 
 def train(epoch):
@@ -83,6 +83,7 @@ def train(epoch):
     nBatches = (len(train_set) + opt.batchSize - 1) // opt.batchSize
 
     for subIter in range(subsetN):
+        print('subIter = ', subIter)
         print('====> Building Cache')
         model.eval()
         train_set.cache = join(opt.cachePath, train_set.whichSet + '_feat_cache.hdf5')
@@ -323,8 +324,9 @@ if __name__ == "__main__":
 
     print(opt)
 
-    if opt.dataset.lower() == 'pittsburgh':
-        import pittsburgh as dataset
+    if opt.dataset.lower() == 'custom':
+        import custom_dataset as dataset
+        print('==> Selected custom dataset(s)')
     else:
         raise Exception('Unknown dataset')
 
@@ -356,9 +358,6 @@ if __name__ == "__main__":
         if opt.split.lower() == 'test':
             whole_test_set = dataset.get_whole_test_set()
             print('===> Evaluating on test set')
-        elif opt.split.lower() == 'test250k':
-            whole_test_set = dataset.get_250k_test_set()
-            print('===> Evaluating on test250k set')
         elif opt.split.lower() == 'train':
             whole_test_set = dataset.get_whole_training_set()
             print('===> Evaluating on train set')
@@ -469,7 +468,7 @@ if __name__ == "__main__":
 
         if isfile(resume_ckpt):
             print("=> loading checkpoint '{}'".format(resume_ckpt))
-            checkpoint = torch.load(resume_ckpt, map_location=lambda storage, loc: storage)
+            checkpoint = torch.load(resume_ckpt, map_location=lambda storage, loc: storage, weights_only=False)
             opt.start_epoch = checkpoint['epoch']
             best_metric = checkpoint['best_score']
             model.load_state_dict(checkpoint['state_dict'])
