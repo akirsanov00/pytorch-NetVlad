@@ -16,9 +16,9 @@ database_ratio = 0.5
 query_ratio = 0.2
 val_test_ration = 0.15
 
-posDistThr = 7
+posDistThr = 100
 posDistSqThr = posDistThr ** 2
-nonTrivPosDistSqThr = 16
+nonTrivPosDistSqThr = 100
 
 output_train_mat = "../../data/datasets/train.mat"
 output_test_mat = "../../data/datasets/test.mat"
