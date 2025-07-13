@@ -16,13 +16,13 @@ database_ratio = 0.5
 query_ratio = 0.2
 val_test_ration = 0.15
 
-posDistThr = 15
+posDistThr = 7
 posDistSqThr = posDistThr ** 2
-nonTrivPosDistSqThr = 25
+nonTrivPosDistSqThr = 16
 
-output_train_mat = "../output/train.mat"
-output_test_mat = "../output/test.mat"
-output_val_mat = "../output/val.mat"
+output_train_mat = "../../data/datasets/train.mat"
+output_test_mat = "../../data/datasets/test.mat"
+output_val_mat = "../../data/datasets/val.mat"
 
 def split_dataset():
     with open(input_json, 'r') as f:
