@@ -28,32 +28,32 @@ def input_transform():
     ])
 
 def get_whole_training_set(onlyDB=False):
-    print('get_whole_training_set')
+    # print('get_whole_training_set')
     structFile = join(struct_dir, 'train.mat')
     return WholeDatasetFromStruct(structFile,
                                   input_transform=input_transform(),
                                   onlyDB=onlyDB)
 
 def get_whole_val_set():
-    print('get_whole_val_set')
+    # print('get_whole_val_set')
     structFile = join(struct_dir, 'val.mat')
     return WholeDatasetFromStruct(structFile,
                              input_transform=input_transform())
 
 def get_whole_test_set():
-    print('get_whole_test_set')
+    # print('get_whole_test_set')
     structFile = join(struct_dir, 'test.mat')
     return WholeDatasetFromStruct(structFile,
                              input_transform=input_transform())
 
 def get_training_query_set(margin=0.1):
-    print('get_training_query_set')
+    # print('get_training_query_set')
     structFile = join(struct_dir, 'train.mat')
     return QueryDatasetFromStruct(structFile,
                                   input_transform=input_transform(), margin=margin)
 
 def get_val_query_set():
-    print('get_val_query_set')
+    # print('get_val_query_set')
     structFile = join(struct_dir, 'val.mat')
     return QueryDatasetFromStruct(structFile,
                              input_transform=input_transform())

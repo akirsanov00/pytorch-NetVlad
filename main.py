@@ -83,7 +83,6 @@ def train(epoch):
     nBatches = (len(train_set) + opt.batchSize - 1) // opt.batchSize
 
     for subIter in range(subsetN):
-        print('subIter = ', subIter)
         print('====> Building Cache')
         model.eval()
         train_set.cache = join(opt.cachePath, train_set.whichSet + '_feat_cache.hdf5')
@@ -108,7 +107,8 @@ def train(epoch):
                     collate_fn=dataset.collate_fn, pin_memory=cuda)
 
         print('Allocated:', torch.cuda.memory_allocated())
-        print('Cached:', torch.cuda.memory_cached())
+        # print('Cached:', torch.cuda.memory_cached())
+        print('Cached:', torch.cuda.memory_reserved())
 
         model.train()
         for iteration, (query, positives, negatives, 

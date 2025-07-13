@@ -110,7 +110,8 @@ def train(epoch):
                     collate_fn=dataset.collate_fn, pin_memory=cuda)
 
         print('Allocated:', torch.cuda.memory_allocated())
-        print('Cached:', torch.cuda.memory_cached())
+        # print('Cached:', torch.cuda.memory_cached())
+        print('Cached:', torch.cuda.memory_reserved())
 
         model.train()
         for iteration, (query, positives, negatives, 
@@ -225,12 +226,14 @@ def test(eval_set, epoch=0, write_tboard=False):
 
     # ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 
-    qIx = 0
+    # qIx = 0
+    qIx = np.random.randint(0, len(eval_set.dbStruct.qImage) - 1)
 
     query_name = eval_set.dbStruct.qImage[qIx]
     query_coord = eval_set.dbStruct.utmQ[qIx].tolist()
 
     top5_preds = predictions[qIx][:5]
+    top20_preds = predictions[qIx][:20]
     gt_set = set(gt[qIx])
 
     # Recall@1
@@ -238,7 +241,7 @@ def test(eval_set, epoch=0, write_tboard=False):
     recall1_name = eval_set.dbStruct.dbImage[recall1_idx]
     recall1_coord = eval_set.dbStruct.utmDb[recall1_idx].tolist()
     recall1_correct = recall1_idx in gt_set
-
+    
     # Recall@5
     recall5 = []
     for idx in top5_preds:
@@ -251,6 +254,18 @@ def test(eval_set, epoch=0, write_tboard=False):
             "correct": correct
         })
 
+    # Recall@20
+    recall20 = []
+    for idx in top20_preds:
+        name = eval_set.dbStruct.dbImage[idx]
+        coord = eval_set.dbStruct.utmDb[idx].tolist()
+        correct = int(idx) in gt_set
+        recall20.append({
+            "name": name,
+            "utm": coord,
+            "correct": correct
+        })
+    
     recall_info = {
         "query": {
             "name": query_name,
@@ -261,7 +276,8 @@ def test(eval_set, epoch=0, write_tboard=False):
             "utm": recall1_coord,
             "correct": recall1_correct
         },
-        "recall@5": recall5
+        "recall@5": recall5,
+        "recall@20": recall20
     }
 
     with open("recall_visualization.json", "w") as f:
@@ -582,3 +598,4 @@ if __name__ == "__main__":
 
         print("=> Best Recall@5: {:.4f}".format(best_score), flush=True)
         writer.close()
+
