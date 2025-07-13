@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import splprep, splev
 from glob import glob
 
-images_folder = '../../images'
+images_folder = '../../data/images'
 output_json = '../output/raw_dataset.json'
 
 
