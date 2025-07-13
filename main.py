@@ -155,7 +155,8 @@ def train(epoch):
                 writer.add_scalar('Train/nNeg', nNeg, 
                         ((epoch-1) * nBatches) + iteration)
                 print('Allocated:', torch.cuda.memory_allocated())
-                print('Cached:', torch.cuda.memory_cached())
+                # print('Cached:', torch.cuda.memory_cached())
+                print('Cached:', torch.cuda.memory_reserved())
 
         startIter += len(training_data_loader)
         del training_data_loader, loss
