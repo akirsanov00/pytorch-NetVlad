@@ -208,7 +208,7 @@ def test(eval_set, epoch=0, write_tboard=False):
     faiss_index.add(dbFeat)
 
     print('====> Calculating recall @ N')
-    n_values = [1,5,10,20]
+    n_values = [1,5,10,20,100,250,500]
 
     _, predictions = faiss_index.search(qFeat, max(n_values)) 
 
@@ -227,14 +227,32 @@ def test(eval_set, epoch=0, write_tboard=False):
 
     # ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 
-    # qIx = 0
-    qIx = np.random.randint(0, len(eval_set.dbStruct.qImage) - 1)
+    rng = np.random.default_rng()
+    qIx = rng.integers(0, len(eval_set.dbStruct.qImage))
 
     query_name = eval_set.dbStruct.qImage[qIx]
     query_coord = eval_set.dbStruct.utmQ[qIx].tolist()
-
+    
+    print('len(predictions) =', len(predictions))
+    
     top5_preds = predictions[qIx][:5]
+    print('len(top5_preds)', len(top5_preds))
+    
+    top10_preds = predictions[qIx][:10]
+    print('len(top10_preds)', len(top10_preds))
+    
     top20_preds = predictions[qIx][:20]
+    print('len(top20_preds)', len(top20_preds))
+    
+    top100_preds = predictions[qIx][:100]
+    print('len(top100_preds)', len(top100_preds))
+    
+    top250_preds = predictions[qIx][:250]
+    print('len(top250_preds)', len(top250_preds))
+    
+    top500_preds = predictions[qIx][:500]
+    print('len(top500_preds)', len(top500_preds))
+    
     gt_set = set(gt[qIx])
 
     # Recall@1
@@ -254,7 +272,7 @@ def test(eval_set, epoch=0, write_tboard=False):
             "utm": coord,
             "correct": correct
         })
-
+        
     # Recall@20
     recall20 = []
     for idx in top20_preds:
@@ -262,6 +280,42 @@ def test(eval_set, epoch=0, write_tboard=False):
         coord = eval_set.dbStruct.utmDb[idx].tolist()
         correct = int(idx) in gt_set
         recall20.append({
+            "name": name,
+            "utm": coord,
+            "correct": correct
+        })
+        
+    # Recall@100
+    recall100 = []
+    for idx in top100_preds:
+        name = eval_set.dbStruct.dbImage[idx]
+        coord = eval_set.dbStruct.utmDb[idx].tolist()
+        correct = int(idx) in gt_set
+        recall100.append({
+            "name": name,
+            "utm": coord,
+            "correct": correct
+        })
+        
+    # Recall@250
+    recall250 = []
+    for idx in top250_preds:
+        name = eval_set.dbStruct.dbImage[idx]
+        coord = eval_set.dbStruct.utmDb[idx].tolist()
+        correct = int(idx) in gt_set
+        recall250.append({
+            "name": name,
+            "utm": coord,
+            "correct": correct
+        })
+    
+    # Recall@500
+    recall500 = []
+    for idx in top500_preds:
+        name = eval_set.dbStruct.dbImage[idx]
+        coord = eval_set.dbStruct.utmDb[idx].tolist()
+        correct = int(idx) in gt_set
+        recall500.append({
             "name": name,
             "utm": coord,
             "correct": correct
@@ -277,11 +331,13 @@ def test(eval_set, epoch=0, write_tboard=False):
             "utm": recall1_coord,
             "correct": recall1_correct
         },
-        "recall@5": recall5,
-        "recall@20": recall20
+        "recall@20": recall20,
+        "recall@100": recall100,
+        "recall@250": recall250,
+        "recall@500": recall500
     }
 
-    with open("recall_visualization.json", "w") as f:
+    with open("src/output/recall_visualization.json", "w") as f:
         json.dump(recall_info, f, indent=4)
     print("====> Saved recall@N to recall_visualization.json")
 
